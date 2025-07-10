@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from fastapi import APIRouter, Query, HTTPException
+from fastapi import APIRouter, Query, HTTPException,Depends
 
 router = APIRouter()
 
@@ -46,7 +46,8 @@ similarity = cosine_similarity(X)
 
 
 @router.get("/")
-def recommend(movie: str = Query(..., description="Movie title to get recommendations for")):
+def recommend(movie: str = Query(..., description="Movie title to get recommendations for"),
+    user=Depends(get_current_user)):
     try:
         index = df[df['Title'] == movie].index[0]
     except IndexError:

@@ -1,4 +1,4 @@
-export default function MovieContainer(){
+export default function HomePage(){
     return(
         <div>
             
