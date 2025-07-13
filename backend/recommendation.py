@@ -6,8 +6,8 @@ router = APIRouter()
 
 df = pd.read_csv("movies.csv")
 
-df["Production House"].fillna("N/A", inplace=True)
-df["Director"].fillna("N/A", inplace=True)
+df["Production House"] = df["Production House"].fillna("N/A")
+df["Director"] = df["Director"].fillna("N/A")
 
 
 df1 = df.drop(columns=['Total Ratings', 'Rating'])
