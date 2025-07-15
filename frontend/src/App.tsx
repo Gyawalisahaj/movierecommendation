@@ -1,15 +1,10 @@
 import { useState } from "react";
 import LoginPage from "./components/login";
 import SignupPage from "./components/Signup";
+import HomePage from "./components/HomePage";
 import "./App.css";
 
-function HomePage() {
-  return (
-    <div className="text-center p-8 text-2xl font-bold text-orange-900">
-      Welcome to the Homepage!
-    </div>
-  );
-}
+
 
 function App() {
   const [showLogin, setShowLogin] = useState(true);
