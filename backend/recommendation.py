@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 from fastapi import APIRouter, Query, HTTPException,Depends
+from auth import get_current_user
 
 router = APIRouter()
 

@@ -1,4 +1,9 @@
 fastapi
-uvicorn
+uvicorn[standard]
 pandas
 scikit-learn
+numpy
+passlib[bcrypt]
+python-jose[cryptography]
+sqlalchemy
+pydantic[email]

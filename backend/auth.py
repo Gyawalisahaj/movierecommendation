@@ -1,55 +1,52 @@
 from fastapi import APIRouter, HTTPException, Depends
+from fastapi.security import OAuth2PasswordBearer
 from pydantic import BaseModel, EmailStr
-from sqlarchmy.orm import Sesson 
+from sqlalchemy.orm import Session
 from passlib.context import CryptContext
 from jose import JWTError, jwt
 from datetime import datetime, timedelta
 
-from . import models, database
+import models
+import database
 
-SECRET_KEY = "SECRETkey123" 
+SECRET_KEY = "your-secret-key"
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 60
-
-
-
+ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 router = APIRouter()
-pwd_context = CryptContext(schemes = ['bcrypt'], deprecated = 'auto')
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
 def get_db():
-    db = database.SessonLocal()
-    try :
+    db = database.SessionLocal()
+    try:
         yield db
     finally:
         db.close()
 
 class SignupRequest(BaseModel):
-    first_name = str,
-    last_name = str,
-    email = EmailStr,
-    password = str,
-    conform_password
+    first_name: str
+    last_name: str
+    email: EmailStr
+    password: str
+    confirm_password: str
 
 class LoginRequest(BaseModel):
-    email = EmailStr,
-    password = str
+    email: EmailStr
+    password: str
 
 class UserResponse(BaseModel):
-    id = int,
-    frist_name = str,
-    last_name = str, 
-    email = EmailStr
+    id: int
+    first_name: str
+    last_name: str
+    email: EmailStr
 
-    class config:
+    class Config:
         orm_mode = True
 
 class Token(BaseModel):
-    access_token = str,
-    token_type = str
-
+    access_token: str
+    token_type: str
 
 def create_access_token(data: dict, expires_delta: timedelta = None):
     to_encode = data.copy()
@@ -87,29 +84,29 @@ async def get_current_user(token: str = Depends(oauth2_scheme), db: Session = De
         raise credentials_exception
     return user
 
-@router.post("/signup", response_model = UserResponse)
-def signup(request : SignupRequest, db : Session = Depends(get_db)):
-    if request.password != request.conform_password:
-        raise HTTPException(status_code=400, detail = 'Password doesmot match ...!')
+@router.post("/signup", response_model=UserResponse)
+def signup(request: SignupRequest, db: Session = Depends(get_db)):
+    if request.password != request.confirm_password:
+        raise HTTPException(status_code=400, detail='Passwords do not match')
 
-    existing_user = db.query(models, User).filter(models.User.email == request.email).first()
+    existing_user = db.query(models.User).filter(models.User.email == request.email).first()
     if existing_user:
-        raise HTTPException(status_code=400, detail="Email already registered....!")
+        raise HTTPException(status_code=400, detail="Email already registered")
 
-    hashed_password = password_context.hash(request.password)
+    hashed_password = pwd_context.hash(request.password)
     user = models.User(
-        first_name = request.frist_name,
-        last_name = request.last_name,
-        email = request.email,
-        hashed_password = hashed_password
+        first_name=request.first_name,
+        last_name=request.last_name,
+        email=request.email,
+        hashed_password=hashed_password
     )
     db.add(user)
     db.commit()
     db.refresh(user)
     return user
 
-@router.post("/login", response_model= UserResponse)
-def login(request: LoginRequest, db: Sesson = Depends(get_db)):
+@router.post("/login")
+def login(request: LoginRequest, db: Session = Depends(get_db)):
     user = authenticate_user(db, request.email, request.password)
     if not user:
         raise HTTPException(status_code=401, detail="Incorrect email or password")

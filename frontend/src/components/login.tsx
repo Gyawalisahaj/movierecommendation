@@ -1,59 +1,117 @@
-import React, {useState} from "react";
-import { useNavigate } from "react-router-dom";
- 
+import React, { useState, ChangeEvent, FormEvent } from "react";
+
+interface LoginForm {
+  email: string;
+  password: string;
+}
 
 interface LoginPageProps {
   onToggle: () => void;
+  onLoginSuccess: () => void;  // add this prop
 }
 
-export default function LoginPage({ onToggle }: LoginPageProps) {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const navigate = useNavigate();
+export default function LoginPage({ onToggle, onLoginSuccess }: LoginPageProps) {
+  const [form, setForm] = useState<LoginForm>({
+    email: "",
+    password: "",
+  });
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const [error, setError] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const { id, value } = e.target;
+    setForm((prev) => ({
+      ...prev,
+      [id]: value,
+    }));
+  };
+
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError("");
+    setLoading(true);
+
     try {
-      const response = await fetch("http://localhost:8000/auth/login", {
+      const res = await fetch("http://localhost:8000/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify(form),
       });
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.detail || "Login failed");
+
+      if (!res.ok) {
+        const data = await res.json();
+        setError(data.detail || "Login failed");
+        setLoading(false);
+        return;
       }
-      const data = await response.json();
-      localStorage.setItem("access_token", data.access_token);
-      navigate("/home"); // or /recommend if you name your route that
+
+      const data = await res.json();
+      localStorage.setItem("token", data.access_token);
+      setLoading(false);
+
+      // Call onLoginSuccess callback here:
+      onLoginSuccess();
+
     } catch (err: any) {
-      setError(err.message);
+      setError("Network error: " + err.message);
+      setLoading(false);
     }
   };
+
   return (
-    <div className="w-full flex flex-col items-center justify-center px-2 py-6">
-      <h1 className="mb-6 text-orange-950 text-3xl font-bold">Login</h1>
-      <form className="w-full max-w-md flex flex-col gap-6" onSubmit={handleLogin}>
-        {/* ...inputs as before */}
+    <div className="flex flex-col items-center justify-center p-6 max-w-md mx-auto min-h-[400px] border rounded-md shadow-md bg-[#F2ECE3]">
+      <h1 className="mb-6 text-orange-950 text-3xl font-bold">Login Page</h1>
+
+      {error && (
+        <div className="text-red-600 text-lg font-semibold mb-4">{error}</div>
+      )}
+
+      <form onSubmit={handleSubmit} className="w-full flex flex-col gap-6">
+        <div className="flex flex-col text-orange-950">
+          <label className="mb-2 text-2xl" htmlFor="email">
+            Email:
+          </label>
+          <input
+            id="email"
+            type="email"
+            placeholder="Enter your Email"
+            className="p-2 border-2 border-orange-700 rounded-md text-black text-base outline-none focus:ring-4 focus:ring-orange-400"
+            value={form.email}
+            onChange={handleChange}
+            required
+          />
+        </div>
+
+        <div className="flex flex-col text-orange-950">
+          <label className="mb-2 text-2xl" htmlFor="password">
+            Password:
+          </label>
+          <input
+            id="password"
+            type="password"
+            placeholder="Enter your Password"
+            className="p-2 border-2 border-orange-700 rounded-md text-black text-base outline-none focus:ring-4 focus:ring-orange-400"
+            value={form.password}
+            onChange={handleChange}
+            required
+          />
+        </div>
+
         <button
           type="submit"
-          className="w-full bg-orange-700 text-orange-50 py-2 px-4 rounded hover:bg-orange-600 hover:ring-4 hover:ring-orange-400 transition font-semibold"
+          className="bg-orange-700 text-orange-950 py-2 px-4 rounded hover:bg-orange-400 transition"
+          disabled={loading}
         >
-          Login
+          {loading ? "Logging in..." : "Login"}
         </button>
-        {error && <div className="text-red-600 font-semibold">{error}</div>}
       </form>
-      <div className="mt-8 flex flex-col gap-2 items-center text-m text-orange-950 underline w-full max-w-md">
-        <a href="/forgot-password">Forgot Password?</a>
-        <button
-          type="button"
-          className="underline text-orange-950"
-          onClick={onToggle}
-        >
-          Create New Account
-        </button>
+
+      <div
+        className="mt-8 text-orange-950 underline cursor-pointer text-center"
+        onClick={onToggle}
+      >
+        Create New Account
       </div>
     </div>
   );
