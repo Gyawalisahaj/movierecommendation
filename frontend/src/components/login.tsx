@@ -100,7 +100,7 @@ export default function LoginPage({ onToggle, onLoginSuccess }: LoginPageProps) 
 
         <button
           type="submit"
-          className="bg-orange-700 text-orange-950 py-2 px-4 rounded hover:bg-orange-400 transition"
+          className="bg-orange-700 text-orange-200 py-2 px-4 rounded hover:bg-orange-400 transition"
           disabled={loading}
         >
           {loading ? "Logging in..." : "Login"}

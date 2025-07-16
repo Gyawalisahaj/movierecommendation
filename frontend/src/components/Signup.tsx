@@ -113,7 +113,7 @@ export default function SignupPage({ onToggle }: SignupPageProps) {
       <div className="flex w-full max-w-md mt-6">
         <button
           type="submit"
-          className="w-full bg-orange-700 text-orange-950 py-2 px-4 rounded hover:bg-orange-400 transition"
+          className="w-full bg-orange-700 text-orange-200 py-2 px-4 rounded hover:bg-orange-400 transition"
         >
           Sign Up
         </button>

@@ -66,7 +66,7 @@ export default function HomePage() {
   };
 
   return (
-    <div className="p-6 flex flex-col items-center gap-6">
+    <div className="p-6 flex flex-col h-max  w-screen bg-[#F9F6EF]  items-center gap-6">
       <h1 className="text-3xl font-bold text-orange-800">Movie Recommender</h1>
 
       <form onSubmit={handleSubmit} className="flex gap-2 w-full max-w-md">
@@ -75,11 +75,11 @@ export default function HomePage() {
           placeholder="Enter movie name..."
           value={movieName}
           onChange={(e) => setMovieName(e.target.value)}
-          className="flex-1 p-2 border-2 border-orange-600 rounded-md outline-none focus:ring-2 focus:ring-orange-400"
+          className="flex-1 p-2 border-2 border-orange-600 rounded-md outline-none focus:ring-2 focus:ring-orange-400 text-orange-800"
         />
         <button
           type="submit"
-          className="bg-orange-700 text-white px-4 rounded hover:bg-orange-500"
+          className="bg-orange-700 text-orange-50 py-2 px-4 rounded hover:bg-orange-400"
         >
           Recommend
         </button>
@@ -88,7 +88,7 @@ export default function HomePage() {
       {loading && <p className="text-orange-700">Loading...</p>}
       {error && <p className="text-red-600">{error}</p>}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-6">
         {recommendations.map((movie) => (
           <MovieCard key={movie.title} movie={movie} />
         ))}

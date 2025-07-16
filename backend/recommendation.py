@@ -69,7 +69,7 @@ def recommend(
             "production_house": row['Production House'] if 'Production House' in df.columns else None,
             "release_date": row['Release Dates'] if 'Release Dates' in df.columns else None,
             "plot": row['Plot'],
-            "image_url": row['Image URL'] if 'Image URL' in df.columns and pd.notna(row['Image URL']) else None,
+            "image_url": row['Image URL'] if 'Image URL' in df.columns and pd.notna(row['Image URL']) else "https://cdn.simplystamps.com/media/catalog/product/5/8/5802-n-a-stock-stamp-hcb.png",
             "video_url": row['Movie URL'] if 'Movie URL' in df.columns and pd.notna(row['Movie URL']) else None,
         })
 
