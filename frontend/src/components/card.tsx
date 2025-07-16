@@ -1,4 +1,5 @@
 // src/components/card.tsx
+
 interface Movie {
   title: string;
   genre: string;

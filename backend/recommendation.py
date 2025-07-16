@@ -32,6 +32,9 @@ df1['describe'] = stri(df1['describe'])
 df1['describe'].head()
 
 
+@router.get("/titles")
+def get_all_titles():
+    return {"titles": df["Title"].dropna().unique().tolist()}
 
 
 df['Title'] = df['Title'].str.replace(r'\(\d{4}\)', '', regex=True).str.strip()
